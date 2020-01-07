@@ -1,7 +1,11 @@
 const app = require('express')()
-const bodyParser = require('body-parser')
+const consign = require('consign')
 
-app.use(bodyParser.json())
+// cwd => especifica o diretorio padrao para o consign
+// verbose false => omite a inicialização do consign
+consign({ cwd: 'src', verbose: false })
+  .include('./config/middlewares.js')
+  .into(app)
 
 // criação de rota genérica
 app.get('/', (req, res) => {
