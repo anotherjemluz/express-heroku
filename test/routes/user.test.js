@@ -1,5 +1,5 @@
 const request = require('supertest')
-const app = require('../src/app')
+const app = require('../../src/app')
 
 const MAIN_ROUTE = '/users'
 // expectativas sempre começam pelo res.status
@@ -12,14 +12,14 @@ test('Deve listar todos os usuários', () => {
   return request(app).get(MAIN_ROUTE)
     .then(res => {
       expect(res.status).toBe(200)
-      expect(res.body).toHaveLength(1)
-      expect(res.body[0]).toHaveProperty('name', 'Jemima Luz')
+      expect(res.body.length).toBeGreaterThan(0)
     })
 })
 
 test('Deve inserir usuário com sucesso', () => {
+  const mail = `${Date.now()}@mail.com`
   return request(app).post(MAIN_ROUTE)
-    .send({ name: 'Jemima Luz', mail: 'jemima@mail.com' })
+    .send({ name: 'Jemima Luz', mail, password: '123' })
     .then(res => {
       expect(res.status).toBe(201)
       expect(res.body.name).toBe('Jemima Luz')
