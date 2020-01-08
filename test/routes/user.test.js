@@ -2,6 +2,8 @@ const request = require('supertest')
 const app = require('../../src/app')
 
 const MAIN_ROUTE = '/users'
+const mail = `${Date.now()}@mail.com`
+
 // expectativas sempre começam pelo res.status
 
 test('Deve listar todos os usuários', () => {
@@ -13,7 +15,6 @@ test('Deve listar todos os usuários', () => {
 }) // 1: realizar um GET no /users esperando: status 200 e uma lista como resposta
 
 test('Deve inserir usuário', () => {
-  const mail = `${Date.now()}@mail.com`
   return request(app).post(MAIN_ROUTE)
     .send({ name: 'Jemima Luz', mail, password: '123' })
     .then(res => {
@@ -35,10 +36,18 @@ for (let i = 0; i < 3; i++) {
     return request(app).post(MAIN_ROUTE)
       .send(user)
       .then(res => {
-        console.log(res.body)
+        // console.log(res.body)
         expect(res.status).toBe(400)
         expect(res.body.error).toBe(`${campo} é um campo obrigatório.`)
       })
   })
 }
 
+test('Não deve inserir usuário com email axistente', () => {
+  return request(app).post(MAIN_ROUTE)
+    .send({ name: 'Jemima Luz', mail, password: '123' })
+    .then(res => {
+      expect(res.status).toBe(400)
+      expect(res.body.error).toBe('Email já cadastrado.')
+    })
+}) //
