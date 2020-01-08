@@ -16,12 +16,39 @@ test('Deve listar todos os usuários', () => {
     })
 })
 
-test('Deve inserir usuário com sucesso', () => {
+test('Deve inserir usuário', () => {
   const mail = `${Date.now()}@mail.com`
   return request(app).post(MAIN_ROUTE)
     .send({ name: 'Jemima Luz', mail, password: '123' })
     .then(res => {
       expect(res.status).toBe(201)
       expect(res.body.name).toBe('Jemima Luz')
+    })
+})
+
+test('Não deve inserir usuário sem nome', () => {
+  return request(app).post(MAIN_ROUTE)
+    .send({ mail: 'naoexiste@mail.com', password: '123' })
+    .then(res => {
+      expect(res.status).toBe(400)
+      expect(res.body.error).toBe('Nome é um campo obrigatório.')
+    })
+})
+
+test('Não deve inserir usuário sem email', () => {
+  return request(app).post(MAIN_ROUTE)
+    .send({ name: 'Jemima Luz', password: '123' })
+    .then(res => {
+      expect(res.status).toBe(400)
+      expect(res.body.error).toBe('Email é um campo obrigatório.')
+    })
+})
+
+test('Não deve inserir usuário sem senha', () => {
+  return request(app).post(MAIN_ROUTE)
+    .send({ name: 'Jemima Luz', mail: 'naoexiste@mail.com' })
+    .then(res => {
+      expect(res.status).toBe(400)
+      expect(res.body.error).toBe('Senha é um campo obrigatório.')
     })
 })
