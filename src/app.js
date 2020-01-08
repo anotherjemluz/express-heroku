@@ -11,6 +11,7 @@ app.db = knex(knexfile.test)
 // verbose false => omite a inicialização do consign
 consign({ cwd: 'src', verbose: false })
   .include('./config/middlewares.js')
+  .then('./services')
   .then('./routes')
   .then('./config/routes.js')
   .into(app)
