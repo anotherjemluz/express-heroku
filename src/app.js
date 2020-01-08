@@ -20,5 +20,12 @@ app.get('/', (req, res) => {
   res.status(200).send()
 })
 
+// LOGGER MANUAL - para visualizar o que as querys tão retornando é só descomentar
+// app.db.on('query', (query) => {
+//   console.log({ sql: query.sql, bindings: query.bindings ? query.bindings.join(',') : '' })
+// }).on('query-response', (response) => {
+//   console.log(response)
+// })
+
 // exportando o objeto app
 module.exports = app
