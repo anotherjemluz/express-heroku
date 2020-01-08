@@ -22,29 +22,23 @@ test('Deve inserir usuário', () => {
     })
 }) // 2: realizar um POST no /users enviando um objeto com .send() esperando: status 201 de inserção
 
-test('Não deve inserir usuário sem nome', () => {
-  return request(app).post(MAIN_ROUTE)
-    .send({ mail: 'naoexiste@mail.com', password: '123' })
-    .then(res => {
-      expect(res.status).toBe(400)
-      expect(res.body.error).toBe('Nome é um campo obrigatório.')
-    })
-}) // 3, 4 e 5: realizar um POST no /users enviando um objeto com .send() com ausenncia de nome, email ou senha esperando: status 400 e mensagem de erro
+// 3, 4 e 5: realizar um POST no /users enviando um objeto com .send() com ausencia de nome, email ou senha esperando: status 400 e mensagem de erro
+for (let i = 0; i < 3; i++) {
+  const user = { name: 'Jemima Luz', mail: 'naoexiste@mail.com', password: '123' }
+  let campo
 
-test('Não deve inserir usuário sem email', () => {
-  return request(app).post(MAIN_ROUTE)
-    .send({ name: 'Jemima Luz', password: '123' })
-    .then(res => {
-      expect(res.status).toBe(400)
-      expect(res.body.error).toBe('Email é um campo obrigatório.')
-    })
-}) // 4
+  if (i === 0) { campo = 'Nome'; delete user.name }
+  if (i === 1) { campo = 'Email'; delete user.mail }
+  if (i === 2) { campo = 'Senha'; delete user.password }
 
-test('Não deve inserir usuário sem senha', () => {
-  return request(app).post(MAIN_ROUTE)
-    .send({ name: 'Jemima Luz', mail: 'naoexiste@mail.com' })
-    .then(res => {
-      expect(res.status).toBe(400)
-      expect(res.body.error).toBe('Senha é um campo obrigatório.')
-    })
-}) // 5
+  test(`Não deve inserir usuário sem ${campo}`, () => {
+    return request(app).post(MAIN_ROUTE)
+      .send(user)
+      .then(res => {
+        console.log(res.body)
+        expect(res.status).toBe(400)
+        expect(res.body.error).toBe(`${campo} é um campo obrigatório.`)
+      })
+  })
+}
+
