@@ -30,6 +30,6 @@ test('Não deve inserir usuário sem senha', (done) => {
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('Senha é um campo obrigatório.')
       done()
-      // done.fail()
     })
+    .catch(err => done.fail(err))
 })
