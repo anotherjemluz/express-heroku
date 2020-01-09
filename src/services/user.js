@@ -4,9 +4,20 @@
   - create: post /users
 */
 
+const bcrypt = require('bcrypt-nodejs')
+
 module.exports = app => {
-  const get = (filter = {}) => {
-    return app.db('users').where(filter).select()
+  const getAll = () => {
+    return app.db('users').select(['id', 'name', 'mail'])
+  }
+
+  const getOne = (filter = {}) => {
+    return app.db('users').where(filter).first()
+  }
+
+  const getPassHash = (password) => {
+    const salt = bcrypt.genSaltSync(10)
+    return bcrypt.hashSync(password, salt)
   }
 
   const save = async (user) => {
@@ -14,11 +25,14 @@ module.exports = app => {
     if (!user.mail) return { error: 'Email é um campo obrigatório.' }
     if (!user.password) return { error: 'Senha é um campo obrigatório.' }
 
-    const userDB = await get({ mail: user.mail })
-    if (userDB && userDB.length > 0) return { error: 'Email já cadastrado.' }
+    const userDB = await getOne({ mail: user.mail })
+    if (userDB) return { error: 'Email já cadastrado.' }
 
-    return app.db('users').insert(user, '*')
+    const newUser = { ...user }
+    newUser.password = getPassHash(user.password)
+
+    return app.db('users').insert(newUser, ['id', 'name', 'mail'])
   }
 
-  return { get, save }
+  return { getAll, getOne, save }
 }

@@ -5,7 +5,7 @@
 */
 module.exports = app => {
   const findAll = (req, res) => {
-    app.services.user.get()
+    app.services.user.getAll()
       .then(result => res.status(200).json(result))
   }
 

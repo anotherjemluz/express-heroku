@@ -2,7 +2,10 @@ const request = require('supertest')
 const app = require('../../src/app')
 
 const MAIN_ROUTE = '/users'
+
+const name = 'Jemima Luz'
 const mail = `${Date.now()}@mail.com`
+const password = '123'
 
 // expectativas sempre começam pelo res.status
 
@@ -16,16 +19,27 @@ test('Deve listar todos os usuários', () => {
 
 test('Deve inserir usuário', () => {
   return request(app).post(MAIN_ROUTE)
-    .send({ name: 'Jemima Luz', mail, password: '123' })
+    .send({ name, mail, password })
     .then(res => {
       expect(res.status).toBe(201)
       expect(res.body.name).toBe('Jemima Luz')
+      expect(res.body).not.toHaveProperty('password')
     })
 }) // 2: realizar um POST no /users enviando um objeto com .send() esperando: status 201 de inserção
 
-// 3, 4 e 5: realizar um POST no /users enviando um objeto com .send() com ausencia de nome, email ou senha esperando: status 400 e mensagem de erro
+test('Deve armazenar senha criptografada', async () => {
+  const res = await request(app).post(MAIN_ROUTE)
+    .send({ name, mail: `${Date.now()}@mail.com`, password })
+  expect(res.status).toBe(201)
+
+  const { id } = res.body
+  const userDB = await app.services.user.getOne({ id })
+  expect(userDB.password).not.toBeUndefined()
+  expect(userDB.password).not.toBe('123')
+}) // 3: realizar um POST no /users enviando um objeto com .send() esperando: status 201 de inserção. Fazer uma seleção no banco com o id da requisição anterior esperando: que haja uma senha e que ela não seja igual ao valor da requisição anterior
+
 for (let i = 0; i < 3; i++) {
-  const user = { name: 'Jemima Luz', mail: 'naoexiste@mail.com', password: '123' }
+  const user = { name, mail: 'naoexiste@mail.com', password }
   let campo
 
   if (i === 0) { campo = 'Nome'; delete user.name }
@@ -41,13 +55,13 @@ for (let i = 0; i < 3; i++) {
         expect(res.body.error).toBe(`${campo} é um campo obrigatório.`)
       })
   })
-}
+} // 4, 5 e 6: realizar um POST no /users enviando um objeto com .send() com ausencia de nome, email ou senha esperando: status 400 e mensagem de erro
 
 test('Não deve inserir usuário com email axistente', () => {
   return request(app).post(MAIN_ROUTE)
-    .send({ name: 'Jemima Luz', mail, password: '123' })
+    .send({ name, mail, password })
     .then(res => {
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('Email já cadastrado.')
     })
-}) //
+}) // 7: realizar um POST no /users enviando um objeto com .send() com email já presente no banco, esperando: status 400 e uma mensagem de erro
