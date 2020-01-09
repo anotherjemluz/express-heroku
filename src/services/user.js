@@ -5,6 +5,7 @@
 */
 
 const bcrypt = require('bcrypt-nodejs')
+const ValidationError = require('../errors/ValidationError')
 
 module.exports = app => {
   const getAll = () => {
@@ -21,12 +22,12 @@ module.exports = app => {
   }
 
   const save = async (user) => {
-    if (!user.name) return { error: 'Nome é um campo obrigatório.' }
-    if (!user.mail) return { error: 'Email é um campo obrigatório.' }
-    if (!user.password) return { error: 'Senha é um campo obrigatório.' }
+    if (!user.name) throw new ValidationError('Nome é um campo obrigatório.')
+    if (!user.mail) throw new ValidationError('Email é um campo obrigatório.')
+    if (!user.password) throw new ValidationError('Senha é um campo obrigatório.')
 
     const userDB = await getOne({ mail: user.mail })
-    if (userDB) return { error: 'Email já cadastrado.' }
+    if (userDB) throw new ValidationError('Email já cadastrado.')
 
     const newUser = { ...user }
     newUser.password = getPassHash(user.password)

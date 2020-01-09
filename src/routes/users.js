@@ -3,18 +3,27 @@
   - findAll:  get /users
   - create: post /users
 */
-module.exports = app => {
-  const findAll = (req, res) => {
+
+const express = require('express')
+
+module.exports = (app) => {
+  const usersRouter = express.Router()
+  app.use('/users', usersRouter)
+
+  usersRouter.get('/', (req, res) => {
     app.services.user.getAll()
       .then(result => res.status(200).json(result))
-  }
+  })
 
-  const create = async (req, res) => {
-    const result = await app.services.user.save(req.body)
-    if (result.error) return res.status(400).json(result)
+  // o retorno do mysql é um número, por padrão.
+  usersRouter.post('/', async (req, res, next) => {
+    try {
+      const result = await app.services.user.save(req.body)
+      return res.status(201).json(result[0])
+    } catch (err) {
+      return next(err)
+    }
+  })
 
-    return res.status(201).json(result[0])
-  }
-
-  return { findAll, create }
+  return usersRouter
 }
