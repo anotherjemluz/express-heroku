@@ -14,19 +14,14 @@ module.exports = {
       password: 'admin'
     },
     migrations: {
-      diretory: 'src/migrations'
+      diretory:     'src/migrations'
     }
   },
   production: {
-    client: 'postgresql',
-    connection: {
-      host: '',
-      database: '',
-      user: '',
-      password: ''
-    },
+    client: 'pg',
+    connection: process.env.DATABASE_URL + `?ssl=true`,
     migrations: {
-      diretory: 'src/migrations'
+      diretory: __dirname + 'src/migrations'
     }
   }
 }

@@ -5,7 +5,7 @@
 */
 
 const bcrypt = require('bcrypt-nodejs')
-const ValidationError = require('../errors/ValidationError')
+const ValidationError = require('../errors/validationError')
 
 module.exports = app => {
   const getAll = () => {
